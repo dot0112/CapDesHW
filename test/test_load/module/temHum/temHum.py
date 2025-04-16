@@ -1,0 +1,2 @@
+def actTemHum():
+    None

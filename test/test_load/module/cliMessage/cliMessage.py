@@ -7,6 +7,15 @@ import humidification
 import soilSensor
 
 
+eventFuncList = [
+    camera.actCamera,
+    temHum.actTemHum,
+    relay.actRelay,
+    waterPump.actWaterPump,
+    humidification.actHumidification,
+    soilSensor.actSoilSensor,
+]
+
 messageBuf = """
 Camera:\t\t\t (%d)
 Temperature/Humidity: \t (%d) %10.2f *C%10.2f %%
