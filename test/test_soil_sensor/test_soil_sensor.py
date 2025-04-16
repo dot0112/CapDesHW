@@ -1,3 +1,18 @@
+"""
+SoilSensor-Black -> GND
+SoilSensor-Brown -> SMPS-V+
+SoilSensor-Blue -> MAX485-B
+SoilSensor-Yellow -> MAX485-A
+
+MAX485-VCC -> 3.3V
+MAX485-GND -> GND
+
+MAX485-DI -> GPIO 4 (Pin 7)
+MAX485-DE -> GPIO 17 (Pin 11)
+MAX485-RE -> GPIO 27 (Pin 13)
+MAX485-RO -> GPIO 5 (Pin 29)
+"""
+
 ### init ###
 
 import time

@@ -1,3 +1,13 @@
+"""
+Motor-A -> L9110s-A-A
+Motor-B -> L9110s-A-B
+
+L9110s-GND -> GND
+L9110s-VCC -> 5V
+L9110s-A-1A -> GPIO 23 (Pin 16)
+L9110s-A-1B -> GPIO 24 (Pin 18)
+"""
+
 import RPi.GPIO as g
 
 A_1A = 23

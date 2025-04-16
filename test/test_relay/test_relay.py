@@ -1,3 +1,8 @@
+"""
+INPUT(-) -> GND
+INPUT(+) -> GPIO 18 (Pin 12)
+"""
+
 import RPi.GPIO as g
 
 RELAYPIN = 18

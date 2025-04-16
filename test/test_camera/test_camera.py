@@ -1,3 +1,7 @@
+"""
+Picamera2 -> CSI Port
+"""
+
 from picamera2 import Picamera2
 import time
 
