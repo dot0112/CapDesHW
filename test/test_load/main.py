@@ -4,13 +4,15 @@ import time
 import module
 
 eventList = [0, 0, 0, 0, 0, 0]
+eventLock = threading.Lock()
 
 
 def on_key(event):
     if event.name.isdigit():
         num = int(event.name)
         if 0 <= num <= 5:
-            eventList[num] = (eventList[num] + 1) % 2
+            with eventLock:
+                eventList[num] = (eventList[num] + 1) % 2
 
 
 def key_listener():
@@ -24,7 +26,8 @@ def main():
 
     try:
         while listener_thread.is_alive():
-            module.printCliMessage(eventList)
+            with eventLock:
+                module.printCliMessage(eventList.copy())
             time.sleep(1)
     except KeyboardInterrupt:
         print("Exiting...")

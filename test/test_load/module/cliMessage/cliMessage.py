@@ -1,10 +1,11 @@
 import os
-import camera
-import temHum
-import relay
-import waterPump
-import humidification
-import soilSensor
+import time
+from .. import camera
+from .. import temHum
+from .. import relay
+from .. import waterPump
+from .. import humidification
+from .. import soilSensor
 
 
 eventFuncList = [
@@ -17,6 +18,9 @@ eventFuncList = [
 ]
 
 messageBuf = """
+----- Load Test -----
+Current Time: %s
+
 Camera:\t\t\t (%d)
 Temperature/Humidity: \t (%d) %10.2f *C%10.2f %%
 Relay: \t\t\t (%d)
@@ -29,21 +33,33 @@ SoilSensor: \t\t (%d) %10.2f *C%10.2f %%%10.2f us/cm%10.2f ph
 
 
 def printCliMessage(eventList=[0, 0, 0, 0, 0, 0]):
-    os.system("clear")
-    temp, humi, soilTemp, soilHumi, soilEC, soilPH = 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+
+    dataBuf = {
+        "temp": 0.0,
+        "humi": 0.0,
+        "soilTemp": 0.0,
+        "soilHumi": 0.0,
+        "soilEC": 0.0,
+        "soilPH": 0.0,
+    }
+
+    for idx, e in enumerate(eventList):
+        eventFuncList[idx](dataBuf, e)
+
     message = messageBuf % (
+        time.strftime("%y/%m/%d %H:%M:%S"),
         eventList[0],
         eventList[1],
-        temp,
-        humi,
+        dataBuf["temp"],
+        dataBuf["humi"],
         eventList[2],
         eventList[3],
         eventList[4],
         eventList[5],
-        soilTemp,
-        soilHumi,
-        soilEC,
-        soilPH,
+        dataBuf["soilTemp"],
+        dataBuf["soilHumi"],
+        dataBuf["soilEC"],
+        dataBuf["soilPH"],
     )
-
+    os.system("clear")
     print(message, end="")
