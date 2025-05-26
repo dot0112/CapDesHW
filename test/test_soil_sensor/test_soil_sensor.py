@@ -28,8 +28,8 @@ TEMP = 1
 EC = 2
 PH = 3
 
-DE = 17
-RE = 27
+DE = 26
+RE = 26
 
 dataMod = [
     [0x02, 0x03, 0x00, 0x00, 0x00, 0x01, 0x84, 0x39],  # moist
@@ -77,7 +77,7 @@ def main():
     global mod
     os.system("clear")
     mod = serial.Serial(
-        port="/dev/ttyAMA3",
+        port="/dev/ttyAMA5",
         baudrate=2400,
         bytesize=serial.EIGHTBITS,
         parity=serial.PARITY_NONE,
