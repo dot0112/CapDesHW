@@ -1,6 +1,7 @@
 from .module import Module
 from main.models import singleton
 from dotenv import load_dotenv
+from threading import Thread
 import RPi.GPIO as g
 import serial
 import time
@@ -8,14 +9,7 @@ import os
 
 
 @singleton
-class Soil(Module):
-    mod = serial.Serial(
-        port="/dev/ttyAMA5",
-        baudrate=2400,
-        bytesize=serial.EIGHTBITS,
-        parity=serial.PARITY_NONE,
-        stopbits=1,
-    )
+class Soil(Thread, Module):
 
     DATAMOD = [
         [0x02, 0x03, 0x00, 0x00, 0x00, 0x01, 0x84, 0x39],  # moist
@@ -24,14 +18,23 @@ class Soil(Module):
         [0x02, 0x03, 0x00, 0x03, 0x00, 0x01, 0x74, 0x39],  # ph
     ]
 
-    BUF_SIZE = 20
     TIMEOUT = 100
 
     def __init__(self):
+        Thread.__init__(self)
         load_dotenv()
+        self.status = False
         self.data = [0.0, 0.0, 0.0, 0.0]
         self.SoilDRE = int(os.getenv("PIN_SOIL"))
+        self.mod = serial.Serial(
+            port="/dev/ttyAMA5",
+            baudrate=2400,
+            bytesize=serial.EIGHTBITS,
+            parity=serial.PARITY_NONE,
+            stopbits=1,
+        )
         g.setup(self.SoilDRE, g.OUT)
+        g.output(self.SoilDRE, 0)
 
     def getModVal(self, val):
         self.mod.reset_input_buffer()
@@ -62,3 +65,15 @@ class Soil(Module):
 
     def deactivate(self):
         pass
+
+    def run(self):
+        while True:
+            if self.controlFlag.soil:
+                self.activate()
+                (
+                    self.sensorData.soilHumi,
+                    self.sensorData.soilTemp,
+                    self.sensorData.soilEC,
+                    self.sensorData.soilPH,
+                ) = self.data
+            time.sleep(1)

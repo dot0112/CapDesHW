@@ -1,9 +1,11 @@
+import threading
 from singleton import singleton
 
 
 @singleton
 class ControlFlag:
     def __init__(self):
+        self._lock = threading.Lock()
         self._camera = False
         self._THSensor = False
         self._relay = False
@@ -13,48 +15,60 @@ class ControlFlag:
 
     @property
     def camera(self):
-        return self._camera
+        with self._lock:
+            return self._camera
 
     @camera.setter
     def camera(self, value):
-        self._camera = bool(value)
+        with self._lock:
+            self._camera = bool(value)
 
     @property
     def THSensor(self):
-        return self._THSensor
+        with self._lock:
+            return self._THSensor
 
     @THSensor.setter
     def THSensor(self, value):
-        self._THSensor = bool(value)
+        with self._lock:
+            self._THSensor = bool(value)
 
     @property
     def relay(self):
-        return self._relay
+        with self._lock:
+            return self._relay
 
     @relay.setter
     def relay(self, value):
-        self._relay = bool(value)
+        with self._lock:
+            self._relay = bool(value)
 
     @property
     def waterPump(self):
-        return self._waterPump
+        with self._lock:
+            return self._waterPump
 
     @waterPump.setter
     def waterPump(self, value):
-        self._waterPump = bool(value)
+        with self._lock:
+            self._waterPump = bool(value)
 
     @property
     def humi(self):
-        return self._humi
+        with self._lock:
+            return self._humi
 
     @humi.setter
     def humi(self, value):
-        self._humi = bool(value)
+        with self._lock:
+            self._humi = bool(value)
 
     @property
     def soil(self):
-        return self._soil
+        with self._lock:
+            return self._soil
 
     @soil.setter
     def soil(self, value):
-        self._soil = bool(value)
+        with self._lock:
+            self._soil = bool(value)

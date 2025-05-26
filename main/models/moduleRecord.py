@@ -1,9 +1,11 @@
+import threading
 from singleton import singleton
 
 
 @singleton
 class ModuleRecord:
     def __init__(self):
+        self._lock = threading.Lock()
         self._camera = None
         self._waterPump = None
         self._THSensor = None
@@ -13,48 +15,60 @@ class ModuleRecord:
 
     @property
     def camera(self):
-        return self._camera
+        with self._lock:
+            return self._camera
 
     @camera.setter
     def camera(self, value):
-        self._camera = value
+        with self._lock:
+            self._camera = value
 
     @property
     def waterPump(self):
-        return self._waterPump
+        with self._lock:
+            return self._waterPump
 
     @waterPump.setter
     def waterPump(self, value):
-        self._waterPump = value
+        with self._lock:
+            self._waterPump = value
 
     @property
     def THSensor(self):
-        return self._THSensor
+        with self._lock:
+            return self._THSensor
 
     @THSensor.setter
     def THSensor(self, value):
-        self._THSensor = value
+        with self._lock:
+            self._THSensor = value
 
     @property
     def humi(self):
-        return self._humi
+        with self._lock:
+            return self._humi
 
     @humi.setter
     def humi(self, value):
-        self._humi = value
+        with self._lock:
+            self._humi = value
 
     @property
     def relay(self):
-        return self._relay
+        with self._lock:
+            return self._relay
 
     @relay.setter
     def relay(self, value):
-        self._relay = value
+        with self._lock:
+            self._relay = value
 
     @property
     def soil(self):
-        return self._soil
+        with self._lock:
+            return self._soil
 
     @soil.setter
     def soil(self, value):
-        self._soil = value
+        with self._lock:
+            self._soil = value
