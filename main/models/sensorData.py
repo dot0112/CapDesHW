@@ -1,5 +1,5 @@
 import threading
-from singleton import singleton
+from models.singleton import singleton
 
 
 @singleton

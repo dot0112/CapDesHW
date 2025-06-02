@@ -1,0 +1,12 @@
+createTableQuery = [
+    "CREATE TABLE TEMP (MONTH INT, DAY_MIN_TEMP INT, DAY_AVG_TEMP INT, DAY_MAX_TEMP INT, NIGHT_MIN_TEMP INT, NIGHT_AVG_TEMP INT, NIGHT_MAX_TEMP INT); ",
+    "CREATE TABLE LIGHT (MONTH INT, AM_SHADING INT, PM_SHADING INT);",
+    "CREATE TABLE WATERING (MONTH INT, ISDAY INT, INTERVAL INT);",
+    "CRAETE TABLE HUMI (MONTH INT, MIN_HUMI INT, AVG_HUMI INT, MAX_HUMI INT);",
+]
+
+
+def dbInit(conn):
+    cursor = conn.cursor()
+    for query in createTableQuery:
+        cursor.execute(query)

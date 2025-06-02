@@ -1,11 +1,11 @@
 import threading
-from singleton import singleton
+from models.singleton import singleton
 
 
 @singleton
 class ControlFlag:
     def __init__(self):
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
         self._camera = False
         self._THSensor = False
         self._relay = False

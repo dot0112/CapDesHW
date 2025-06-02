@@ -1,10 +1,11 @@
 from abc import *
-from main.models import SensorData, ControlFlag
+from models import SensorData, ControlFlag, ModuleRecord
 
 
 class Module(metaclass=ABCMeta):
     sensorData = SensorData()
     controlFlag = ControlFlag()
+    moduleRecord = ModuleRecord()
 
     @abstractmethod
     def activate(self):

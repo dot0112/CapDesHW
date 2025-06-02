@@ -1,7 +1,8 @@
 from .module import Module
-from main.models import singleton
+from models import singleton
 from dotenv import load_dotenv
 from threading import Thread
+from datetime import datetime
 import RPi.GPIO as g
 import time
 import os
@@ -24,13 +25,16 @@ class Humi(Thread, Module):
 
     def activate(self):
         self.switchHumidification()
+        self.moduleRecord.humi = datetime.now()
 
     def deactivate(self):
-        pass
+        self.switchHumidification()
 
     def run(self):
         while True:
             if self.controlFlag.humi != self.status == True:
                 self.activate()
                 self.status = not self.status
+                self.activate() if self.status else self.deactivate()
+
             time.sleep(1)

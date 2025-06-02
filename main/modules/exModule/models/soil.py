@@ -1,7 +1,8 @@
 from .module import Module
-from main.models import singleton
+from models import singleton
 from dotenv import load_dotenv
 from threading import Thread
+from datetime import datetime
 import RPi.GPIO as g
 import serial
 import time
@@ -62,6 +63,7 @@ class Soil(Thread, Module):
         for i in range(4):
             self.data[i] = self.getModVal(i) * (0.1 if i != 2 else 1)
             time.sleep(0.1)
+        self.moduleRecord.soil = datetime.now()
 
     def deactivate(self):
         pass
