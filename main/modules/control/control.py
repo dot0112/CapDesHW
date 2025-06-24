@@ -112,10 +112,10 @@ class Control(Thread):
                 if nowHour in (self.schedule["W"], self.schedule["W"] + 1):
                     self.controlFlag.waterPump = True
                     while True:
-                        print(f"[control:watering] soilHumiData: {soilHumiData}")
                         self.controlFlag.soil = True
                         time.sleep(0.1)
                         soilHumiData = self.sensorData.soilHumi
+                        print(f"[control:watering] soilHumiData: {soilHumiData}")
                         if self.controlFlag.waterPumpF or self.controlFlag.setF:
                             print("[control:watering] break by force watering")
                             self.controlFlag.waterPump = True
@@ -147,11 +147,10 @@ class Control(Thread):
             if humiData < self.schedule["minH"]:
                 self.controlFlag.humi = True
                 while True:
-                    print(1)
                     self.controlFlag.THSensor = True
                     humiData = self.sensorData.humi
                     time.sleep(2.5)
-                    print(f"[control:humidification] humiData: {humiData}")
+                    print(f"[control:humidification] humiData: {humiData}/{self.schedule['maxH']}")
                     if self.controlFlag.humiF or self.controlFlag.setF:
                         print("[control:humi] break by force humi")
                         self.controlFlag.humi = True

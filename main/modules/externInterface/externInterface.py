@@ -17,7 +17,7 @@ class ExternInterface:
         if self.connectWiFi.loadData() == 0:
             self.connectWiFi.connect()
 
-        self.scheduler.add_job(func=self.uploadSensor, trigger="cron", minute="*/1")
+        self.scheduler.add_job(func=self.uploadSensor, trigger="cron", minute="*/5")
         self.scheduler.start()
 
     def runAll(self):
