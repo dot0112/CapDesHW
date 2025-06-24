@@ -12,9 +12,13 @@ def main():
 
     print("Init")
 
-    moduleControl = ExModule()
-    moduleControl.runAll()
+    exControl = ExModule()
+    exControl.runAll()
     print("Module Run Complete")
+
+    control = Control()
+    control.start()
+    print("Control Run Complete")
 
     externInterface = ExternInterface()
     externInterface.runAll()

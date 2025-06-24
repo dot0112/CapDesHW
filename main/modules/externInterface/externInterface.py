@@ -1,5 +1,5 @@
 from models import singleton
-from .modules import ConnectWiFi, DataUpload, RequestCallback, BtListen
+from .models import ConnectWiFi, DataUpload, RequestCallback, BtListen
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
 

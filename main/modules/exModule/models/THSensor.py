@@ -10,9 +10,12 @@ import os
 class THSensor(Thread, Module):
     def __init__(self):
         Thread.__init__(self)
-        self.i2c = board.I2C()
-        self.sensor = adafruit_sht31d.SHT31D(self.i2c)
-        self.data = [0.0, 0.0]
+        try:
+            self.i2c = board.I2C()
+            self.sensor = adafruit_sht31d.SHT31D(self.i2c)
+            self.data = [0.0, 0.0]
+        except Exception as e:
+            print(e)
 
     def activate(self):
         print("[exModule] THSensor activate")

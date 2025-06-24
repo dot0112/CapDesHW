@@ -12,9 +12,10 @@ class ControlFlag:
         self._humi = Event()
         self._soil = Event()
 
-        self._fRelay = False
-        self._fWaterPump = False
-        self._fhumi = False
+        self._releaseF = Event()
+        self._relayF = False
+        self._waterPumpF = False
+        self._humiF = False
 
     @property
     def camera(self):
@@ -83,29 +84,64 @@ class ControlFlag:
             self._soil.clear()
 
     @property
+    def releaseF(self):
+        return self._releaseF.is_set()
+
+    @releaseF.setter
+    def releaseF(self, value):
+        if value:
+            self._releaseF.set()
+        else:
+            self._releaseF.clear()
+
+    @property
+    def waterPumpF(self):
+        return self._waterPumpF
+
+    @waterPumpF.setter
+    def waterPumpF(self, value):
+        self._waterPumpF = value
+
+    @property
+    def humiF(self):
+        return self._humiF
+
+    @humiF.setter
+    def humiF(self, value):
+        self._humiF = value
+
+    @property
+    def relayF(self):
+        return self._relayF
+
+    @relayF.setter
+    def relayF(self, value):
+        self._relayF = value
+
+    @property
     def cameraEvent(self):
         return self._camera
-    
+
     @property
     def THSensorEvent(self):
         return self._THSensor
-    
-    
+
     @property
     def relayEvent(self):
         return self._relay
-    
-    
+
     @property
     def waterPumpEvent(self):
         return self._waterPump
 
-
     @property
     def humiEvent(self):
         return self._humi
-    
-    
+
     @property
     def soilEvent(self):
         return self._soil
+
+    @property
+    def releaseFEvent(self):
+        return self._releaseF
