@@ -1,13 +1,15 @@
-from models import singleton, ControlFlag, SensorData
+from models import ControlFlag, SensorData
+from threading import Thread
 from pyzbar.pyzbar import decode
 import subprocess
 import time
 import re
 
 
-@singleton
-class ConnectWiFi:
+class ConnectWiFi(Thread):
     def __init__(self):
+        Thread.__init__(self)
+
         self.SSID = ""
         self.PW = ""
         self.image = None
@@ -101,3 +103,17 @@ class ConnectWiFi:
         if result.returncode == 0:
             self.saveData()
         return result.returncode == 0
+
+    def run(self):
+        try:
+            while True:
+                if self.status() is None:
+                    qr = self.qrScan()
+                    if qr and self.parseWifiQr():
+                        self.connect()
+                else:
+                    time.sleep(5)
+                time.sleep(1)
+        except Exception as e:
+            print(f"WiFi thread error: {e}")
+            time.sleep(5)

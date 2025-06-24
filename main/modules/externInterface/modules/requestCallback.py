@@ -1,7 +1,6 @@
-from models import singleton, ControlFlag
+from models import ControlFlag
 
 
-@singleton
 class RequestCallback:
     def __init__(self):
         self.controlFlag = ControlFlag()

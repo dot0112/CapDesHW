@@ -1,24 +1,28 @@
 from .module import Module
-from models import singleton
 from picamera2 import Picamera2
 from threading import Thread
 from datetime import datetime
-import time
 
 
-@singleton
 class Camera(Thread, Module):
     def __init__(self):
         Thread.__init__(self)
         self.cameraCapture = None
-        self.camera = Picamera2()
-        self.camera.configure(
-            self.camera.create_still_configuration(main={"size": (1280, 720)})
-        )
-        self.camera.start()
+        try:
+            self.camera = Picamera2()
+            self.camera.configure(
+                self.camera.create_still_configuration(main={"size": (1280, 720)})
+            )
+            self.camera.start()
+        except Exception as e:
+            print(e)
 
     def activate(self):
-        self.cameraCapture = self.camera.capture_array()
+        print("[exModule] camera activate")
+        try:
+            self.cameraCapture = self.camera.capture_array()
+        except Exception as e:
+            print(f"[error] camera error: {e}")
         self.moduleRecord.camera = datetime.now()
 
     def deactivate(self):
@@ -26,9 +30,9 @@ class Camera(Thread, Module):
 
     def run(self):
         while True:
-            with self.controlFlag._lock:
-                if self.controlFlag.camera:
-                    self.activate()
-                    self.sensorData.cameraCapture = self.cameraCapture
-                    self.controlFlag.camera = False
-            time.sleep(1)
+            self.controlFlag.cameraEvent.wait()
+
+            self.activate()
+            self.sensorData.cameraCapture = self.cameraCapture
+
+            self.controlFlag.camera = False

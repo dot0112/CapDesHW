@@ -17,7 +17,7 @@ def main():
     print("Module Run Complete")
 
     externInterface = ExternInterface()
-    externInterface.start()
+    externInterface.runAll()
     print("Extern Interface Run Complete")
 
     while True:

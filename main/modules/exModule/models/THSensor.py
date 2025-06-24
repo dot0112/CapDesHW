@@ -1,5 +1,4 @@
 from .module import Module
-from models import singleton
 from threading import Thread
 from datetime import datetime
 import adafruit_sht31d
@@ -8,7 +7,6 @@ import time
 import os
 
 
-@singleton
 class THSensor(Thread, Module):
     def __init__(self):
         Thread.__init__(self)
@@ -17,6 +15,7 @@ class THSensor(Thread, Module):
         self.data = [0.0, 0.0]
 
     def activate(self):
+        print("[exModule] THSensor activate")
         self.data = [self.sensor.temperature, self.sensor.relative_humidity]
         self.moduleRecord.THSensor = datetime.now()
 
@@ -25,7 +24,10 @@ class THSensor(Thread, Module):
 
     def run(self):
         while True:
-            if self.controlFlag.THSensor:
-                self.activate()
-                (self.sensorData.temp, self.sensorData.humi) = self.data
-            time.sleep(1)
+            self.controlFlag.THSensorEvent.wait()
+
+            self.activate()
+            (self.sensorData.temp, self.sensorData.humi) = self.data
+
+            self.controlFlag.THSensor = False
+            

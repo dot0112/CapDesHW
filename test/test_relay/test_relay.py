@@ -5,7 +5,7 @@ INPUT(+) -> GPIO 18 (Pin 12)
 
 import RPi.GPIO as g
 
-RELAYPIN = 18
+RELAYPIN = 1
 
 g.setmode(g.BCM)
 g.setup(RELAYPIN, g.OUT)

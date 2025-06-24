@@ -1,5 +1,4 @@
 from .module import Module
-from models import singleton
 from dotenv import load_dotenv
 from threading import Thread
 from datetime import datetime
@@ -8,7 +7,6 @@ import time
 import os
 
 
-@singleton
 class WaterPump(Thread, Module):
     def __init__(self):
         Thread.__init__(self)
@@ -21,6 +19,7 @@ class WaterPump(Thread, Module):
         g.output(self.WATERPUMP_B, g.LOW)
 
     def activate(self):
+        print("[exModule] waterPump activate")
         g.output(self.WATERPUMP_A, g.HIGH)
         self.moduleRecord.waterPump = datetime.now()
 
@@ -29,7 +28,9 @@ class WaterPump(Thread, Module):
 
     def run(self):
         while True:
-            if self.controlFlag.waterPump != self.status:
-                self.status = not self.status
-                self.activate() if self.status else self.deactivate()
-            time.sleep(1)
+            self.controlFlag.waterPumpEvent.wait()
+
+            self.status = not self.status
+            self.activate() if self.status else self.deactivate()
+            
+            self.controlFlag.waterPump = False

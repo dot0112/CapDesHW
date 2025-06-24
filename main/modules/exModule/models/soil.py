@@ -1,5 +1,4 @@
 from .module import Module
-from models import singleton
 from dotenv import load_dotenv
 from threading import Thread
 from datetime import datetime
@@ -9,7 +8,6 @@ import time
 import os
 
 
-@singleton
 class Soil(Thread, Module):
 
     DATAMOD = [
@@ -60,6 +58,7 @@ class Soil(Thread, Module):
         return int(buf[3] << 8 | buf[4])
 
     def activate(self):
+        print("[exModule] soil activate")
         for i in range(4):
             self.data[i] = self.getModVal(i) * (0.1 if i != 2 else 1)
             time.sleep(0.1)
@@ -70,12 +69,14 @@ class Soil(Thread, Module):
 
     def run(self):
         while True:
-            if self.controlFlag.soil:
-                self.activate()
-                (
+            self.controlFlag.soilEvent.wait()
+
+            self.activate()
+            (
                     self.sensorData.soilHumi,
                     self.sensorData.soilTemp,
                     self.sensorData.soilEC,
                     self.sensorData.soilPH,
-                ) = self.data
-            time.sleep(1)
+            ) = self.data
+
+            self.controlFlag.soil = False

@@ -1,74 +1,111 @@
-import threading
+from threading import Event, RLock
 from models.singleton import singleton
 
 
 @singleton
 class ControlFlag:
     def __init__(self):
-        self._lock = threading.RLock()
-        self._camera = False
-        self._THSensor = False
-        self._relay = False
-        self._waterPump = False
-        self._humi = False
-        self._soil = False
+        self._camera = Event()
+        self._THSensor = Event()
+        self._relay = Event()
+        self._waterPump = Event()
+        self._humi = Event()
+        self._soil = Event()
+
+        self._fRelay = False
+        self._fWaterPump = False
+        self._fhumi = False
 
     @property
     def camera(self):
-        with self._lock:
-            return self._camera
+        return self._camera.is_set()
 
     @camera.setter
     def camera(self, value):
-        with self._lock:
-            self._camera = bool(value)
+        if value:
+            self._camera.set()
+        else:
+            self._camera.clear()
 
     @property
     def THSensor(self):
-        with self._lock:
-            return self._THSensor
+        return self._THSensor.is_set()
 
     @THSensor.setter
     def THSensor(self, value):
-        with self._lock:
-            self._THSensor = bool(value)
+        if value:
+            self._THSensor.set()
+        else:
+            self._THSensor.clear()
 
     @property
     def relay(self):
-        with self._lock:
-            return self._relay
+        return self._relay.is_set()
 
     @relay.setter
     def relay(self, value):
-        with self._lock:
-            self._relay = bool(value)
+        if value:
+            self._relay.set()
+        else:
+            self._relay.clear()
 
     @property
     def waterPump(self):
-        with self._lock:
-            return self._waterPump
+        return self._waterPump.is_set()
 
     @waterPump.setter
     def waterPump(self, value):
-        with self._lock:
-            self._waterPump = bool(value)
+        if value:
+            self._waterPump.set()
+        else:
+            self._waterPump.clear()
 
     @property
     def humi(self):
-        with self._lock:
-            return self._humi
+        return self._humi.is_set()
 
     @humi.setter
     def humi(self, value):
-        with self._lock:
-            self._humi = bool(value)
+        if value:
+            self._humi.set()
+        else:
+            self._humi.clear()
 
     @property
     def soil(self):
-        with self._lock:
-            return self._soil
+        return self._soil.is_set()
 
     @soil.setter
     def soil(self, value):
-        with self._lock:
-            self._soil = bool(value)
+        if value:
+            self._soil.set()
+        else:
+            self._soil.clear()
+
+    @property
+    def cameraEvent(self):
+        return self._camera
+    
+    @property
+    def THSensorEvent(self):
+        return self._THSensor
+    
+    
+    @property
+    def relayEvent(self):
+        return self._relay
+    
+    
+    @property
+    def waterPumpEvent(self):
+        return self._waterPump
+
+
+    @property
+    def humiEvent(self):
+        return self._humi
+    
+    
+    @property
+    def soilEvent(self):
+        return self._soil
