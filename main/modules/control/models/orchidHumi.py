@@ -2,7 +2,6 @@ class OrchidHumi:
     def __init__(self):
         self._month = 0
         self._minHumi = 0
-        self._avgHumi = 0
         self._maxHumi = 0
 
     @property
@@ -20,14 +19,6 @@ class OrchidHumi:
     @minHumi.setter
     def minHumi(self, value):
         self._minHumi = value
-
-    @property
-    def avgHumi(self):
-        return self._avgHumi
-
-    @avgHumi.setter
-    def avgHumi(self, value):
-        self._avgHumi = value
 
     @property
     def maxHumi(self):

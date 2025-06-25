@@ -26,6 +26,11 @@ class ExModule:
         print("waterpump run")
         self._waterPump.start()
 
+    def clear(self):
+        self._humi.clear()
+        self._relay.clear()
+        self._waterPump.clear()
+
     @property
     def camera(self):
         return self._camera

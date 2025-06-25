@@ -5,6 +5,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from modules import ExModule
 import time
 import threading
+import math
 from threading import Thread
 
 
@@ -24,7 +25,7 @@ class Control(Thread):
 
         self.wateringInterval = 0
 
-        self.schedule = {"W": 0, "startL": 0, "endL": 0}
+        self.schedule = {"W": 0, "startL": 0, "endL": 0, "minH": 0, "maxH": 0}
 
         self.scheduler.add_job(
             self.setTodaySchedule,
@@ -59,6 +60,7 @@ class Control(Thread):
             )
 
         (self.schedule["startL"], self.schedule["endL"]) = self.getLightingSchedule()
+        (self.schedule["minH"], self.schedule["maxH"]) = self.getHumiSchedule()
 
         self.scheduler.add_job(
             self.lighting,
@@ -79,7 +81,7 @@ class Control(Thread):
         )
 
     def getWateringSchedule(self):
-        dto = self.dao.getWatering()
+        dto = self.dao.getWatering(self.month)
 
         self.wateringInterval = max(dto.interval, self.wateringInterval)
         lastWatering = self.moduleRecord.waterPump
@@ -91,31 +93,42 @@ class Control(Thread):
         return {"needWatering": needWatering, "isDay": dto.isDay}
 
     def getLightingSchedule(self):
-        dto = self.dao.getLight()
-        return (7, 7 + (12 * (dto.pmShading / 100)))
+
+        dto = self.dao.getLight(self.month)
+        return (
+            7 + math.floor((5 * (dto.amShading) / 100)),
+            13 + math.ceil((5 * ((100 - dto.pmShading) / 100))),
+        )
 
     def getHumiSchedule(self):
-        dto = self.dao.getHumi()
+        dto = self.dao.getHumi(self.month)
         return (dto.minHumi, dto.maxHumi)
 
     def watering(self):
+        print("[watering]")
         if not self.controlFlag.waterPumpF:
             if self.schedule["W"] != 0:
                 nowHour = datetime.now().hour
                 if nowHour in (self.schedule["W"], self.schedule["W"] + 1):
                     self.controlFlag.waterPump = True
                     while True:
+                        print(f"[control:watering] soilHumiData: {soilHumiData}")
                         self.controlFlag.soil = True
                         time.sleep(0.1)
                         soilHumiData = self.sensorData.soilHumi
-                        if self.controlFlag.waterPumpF:
-                            print("[control:watering] break by force humi")
+                        if self.controlFlag.waterPumpF or self.controlFlag.setF:
+                            print("[control:watering] break by force watering")
+                            self.controlFlag.waterPump = True
                             break
                         if soilHumiData is not None and soilHumiData >= 45:
                             self.controlFlag.waterPump = True
                             break
+                else:
+                    if self.ex.waterPump.status == True:
+                        self.controlFlag.waterPump = True
 
     def lighting(self):
+        print("[lighting]")
         if not self.controlFlag.relayF:
             nowHour = datetime.now().hour
             if self.schedule["startL"] <= nowHour < self.schedule["endL"]:
@@ -128,19 +141,25 @@ class Control(Thread):
     def humidification(self):
         if not self.controlFlag.humiF:
             self.controlFlag.THSensor = True
-            time.sleep(0.1)
-            (minHumi, maxHumi) = self.getHumiSchedule()
+            time.sleep(2.5)
             humiData = self.sensorData.humi
 
-            if humiData < minHumi:
+            if humiData < self.schedule["minH"]:
                 self.controlFlag.humi = True
                 while True:
+                    print(1)
                     self.controlFlag.THSensor = True
                     humiData = self.sensorData.humi
-                    if self.controlFlag.humiF:
+                    time.sleep(2.5)
+                    print(f"[control:humidification] humiData: {humiData}")
+                    if self.controlFlag.humiF or self.controlFlag.setF:
                         print("[control:humi] break by force humi")
+                        self.controlFlag.humi = True
                         break
-                    if humiData <= maxHumi:
+                    if humiData >= self.schedule["maxH"]:
+                        print(
+                            f"[control:humi] over maxH: {humiData}/{self.schedule['maxH']}"
+                        )
                         self.controlFlag.humi = True
                         break
 
@@ -160,7 +179,7 @@ class Control(Thread):
     def setReleaseControl(self):
         self.controlFlag.releaseFEvent.wait()
 
-        self.runTread()
+        self.runThread()
 
         self.controlFlag.releaseF = False
 

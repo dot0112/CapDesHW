@@ -12,6 +12,7 @@ class ControlFlag:
         self._humi = Event()
         self._soil = Event()
 
+        self._setF = Event()
         self._releaseF = Event()
         self._relayF = False
         self._waterPumpF = False
@@ -93,6 +94,17 @@ class ControlFlag:
             self._releaseF.set()
         else:
             self._releaseF.clear()
+
+    @property
+    def setF(self):
+        return self._setF.is_set()
+
+    @setF.setter
+    def setF(self, value):
+        if value:
+            self._setF.set()
+        else:
+            self._setF.clear()
 
     @property
     def waterPumpF(self):

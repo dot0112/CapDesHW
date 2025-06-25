@@ -24,6 +24,9 @@ class Relay(Thread, Module):
     def deactivate(self):
         g.output(self.RELAY, g.LOW)
 
+    def clear(self):
+        g.output(self.RELAY, g.LOW)
+
     def run(self):
         while True:
             self.controlFlag.relayEvent.wait()

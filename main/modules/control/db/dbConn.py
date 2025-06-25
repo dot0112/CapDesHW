@@ -4,7 +4,7 @@ import sqlite3
 
 
 conn = None
-dbPath = "./main/orchid.db"
+dbPath = "./orchid.db"
 
 
 def dbConn():
@@ -12,7 +12,7 @@ def dbConn():
     if conn is None:
         try:
             dbExists = os.path.exists(dbPath)
-            conn = sqlite3.connect(dbPath)
+            conn = sqlite3.connect(dbPath, check_same_thread=False)
             if not dbExists:
                 dbInit(conn)
         except sqlite3.Error as e:

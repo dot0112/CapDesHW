@@ -11,7 +11,7 @@ class DataUpload:
         self.sensorData = SensorData()
         self.controlFlag = ControlFlag()
         self.moduleRecord = ModuleRecord()
-        self.serverAddr = ""
+        self.serverAddr = "http://134.185.115.80:8080"
 
     def getSensorData(self):
         now = datetime.now()
@@ -21,39 +21,44 @@ class DataUpload:
         self.controlFlag.soil = True
 
         while True:
-            if all([
+            if all(
+                [
                     self.moduleRecord.camera is not None,
                     self.moduleRecord.THSensor is not None,
-                    self.moduleRecord.soil is not None
-                ]):
-                slowest = min(self.moduleRecord.camera, self.moduleRecord.THSensor, self.moduleRecord.soil)
+                    self.moduleRecord.soil is not None,
+                ]
+            ):
+                slowest = min(
+                    self.moduleRecord.camera,
+                    self.moduleRecord.THSensor,
+                    self.moduleRecord.soil,
+                )
                 print(slowest)
                 if now < slowest:
                     break
                 time.sleep(1)
 
-
     def uploadSensorData(self):
         result = {"sensor": None, "image": None}
         self.getSensorData()
 
-        result ["sensor"] = self.uploadSensor()
-        result ["image"] = self.uploadImage()
+        result["sensor"] = self.uploadSensor()
+        result["image"] = self.uploadImage()
 
         return result
 
-
     def uploadSensor(self):
+        print("uploadSensor")
         apiUrl = self.serverAddr + "/api/sensor"
 
         data = {
             "deviceId": os.getenv("DEVICEID"),
-            "temperature": self.sensorData.temp,
-            "humidity": self.sensorData.humi,
-            "soilTemperature": self.sensorData.soilTemp,
-            "soilMoisture": self.sensorData.soilHumi,
-            "soilEC": self.sensorData.soilEC,
-            "soilPH": self.sensorData.soilPH,
+            "temperature": round(self.sensorData.temp, 2),  # 1 자리
+            "humidity": round(self.sensorData.humi, 2),
+            "soilTemperature": round(self.sensorData.soilTemp, 2),
+            "soilMoisture": round(self.sensorData.soilHumi, 2),
+            "soilEC": round(self.sensorData.soilEC, 2),  # 2 자리
+            "soilPH": round(self.sensorData.soilPH, 2),  # 2 자리
         }
         print(f"[upload sensor]: {data}")
 
@@ -65,19 +70,18 @@ class DataUpload:
             return False
 
     def uploadImage(self):
-        apiUrl = self.serverAddr + "/api/image"
+        print("uploadImage")
+        apiUrl = self.serverAddr + "/api/image/upload"
         data = self.sensorData.cameraCapture
 
-        success, imgEncoded = cv2.imencode('.jpg', data)
+        success, imgEncoded = cv2.imencode(".jpg", data)
         if not success:
             print("[upload image]: Failed to encode image")
             return False
 
         fileBytes = imgEncoded.tobytes()
 
-        files = {
-            "image": ("leaf.jpg", fileBytes, "image/jpeg")
-        }
+        files = {"file": ("leaf.jpg", fileBytes, "image/jpeg")}
 
         try:
             response = requests.post(apiUrl, files=files)

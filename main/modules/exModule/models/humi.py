@@ -23,7 +23,9 @@ class Humi(Thread, Module):
 
     def deactivate(self):
         g.output(self.HUMIDIFICATION, g.LOW)
-        
+
+    def clear(self):
+        g.output(self.HUMIDIFICATION, g.LOW)
 
     def run(self):
         while True:

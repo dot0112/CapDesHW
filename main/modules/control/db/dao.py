@@ -1,6 +1,6 @@
 from models import singleton
 from .dbConn import dbConn
-from ..models import OrchidLight, OrchidTemp, OrchidWatering, OrchidHumi
+from ..models import OrchidLight, OrchidWatering, OrchidHumi
 
 
 @singleton
@@ -10,9 +10,9 @@ class Dao:
         self.cursor = self.conn.cursor()
 
     def getHumi(self, month):
-        result = self._fetchByMonth("HUMI", month)
+        result = self._fetchByMonth("HUMIDIFICATION", month)
         dto = OrchidHumi()
-        (dto.month, dto.minHumi, dto.avgHumi, dto.maxHumi) = result
+        (dto.month, dto.minHumi, dto.maxHumi) = result
         return dto
 
     def getLight(self, month):
@@ -22,20 +22,6 @@ class Dao:
             dto.month,
             dto.amShading,
             dto.pmShading,
-        ) = result
-        return dto
-
-    def getTemp(self, month):
-        result = self._fetchByMonth("TEMP", month)
-        dto = OrchidTemp()
-        (
-            dto.month,
-            dto.dayMinTemp,
-            dto.dayAvgTemp,
-            dto.dayMaxTemp,
-            dto.nightMinTemp,
-            dto.nightAvgTemp,
-            dto.nightMaxTemp,
         ) = result
         return dto
 
@@ -50,7 +36,7 @@ class Dao:
         return dto
 
     def _fetchByMonth(self, tableName, month):
-        allowed_tables = {"HUMI", "LIGHT", "TEMP", "WATERING"}
+        allowed_tables = {"HUMIDIFICATION", "LIGHT", "WATERING"}
 
         if tableName not in allowed_tables:
             raise ValueError("Invalid table name")

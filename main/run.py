@@ -5,27 +5,30 @@ import time
 
 
 def main():
-    g.setmode(g.BCM)
-    SensorData()
-    ControlFlag()
-    ModuleRecord()
+    try:
+        g.setmode(g.BCM)
+        SensorData()
+        ControlFlag()
+        ModuleRecord()
 
-    print("Init")
+        print("Init")
 
-    exControl = ExModule()
-    exControl.runAll()
-    print("Module Run Complete")
+        exModule = ExModule()
+        exModule.runAll()
+        print("Module Run Complete")
 
-    control = Control()
-    control.start()
-    print("Control Run Complete")
+        control = Control()
+        control.start()
+        print("Control Run Complete")
 
-    externInterface = ExternInterface()
-    externInterface.runAll()
-    print("Extern Interface Run Complete")
+        externInterface = ExternInterface()
+        externInterface.runAll()
+        print("Extern Interface Run Complete")
 
-    while True:
-        time.sleep(1)
+        while True:
+            time.sleep(1)
+    finally:
+        exModule.clear()
 
 
 if __name__ == "__main__":

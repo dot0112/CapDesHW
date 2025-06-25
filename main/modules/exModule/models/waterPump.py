@@ -26,11 +26,14 @@ class WaterPump(Thread, Module):
     def deactivate(self):
         g.output(self.WATERPUMP_A, g.LOW)
 
+    def clear(self):
+        g.output(self.WATERPUMP_A, g.LOW)
+
     def run(self):
         while True:
             self.controlFlag.waterPumpEvent.wait()
 
             self.status = not self.status
             self.activate() if self.status else self.deactivate()
-            
+
             self.controlFlag.waterPump = False

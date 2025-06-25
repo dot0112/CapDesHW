@@ -1,4 +1,5 @@
 from threading import Thread
+from bluetooth.btcommon import BluetoothError
 from models import ControlFlag
 from modules import ExModule
 import bluetooth
@@ -16,7 +17,7 @@ class BtListen(Thread):
         self.modules = {
             "w": (self.ex.waterPump, "waterPump"),
             "h": (self.ex.humi, "humi"),
-            "R": (self.ex.relay, "relay"),
+            "r": (self.ex.relay, "relay"),
         }
 
         try:
@@ -27,9 +28,11 @@ class BtListen(Thread):
             subprocess.run(["sudo", "hciconfig", "hci0", "piscan"], check=True)
 
             self.serverSock = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
-            self.port = 1
-            self.serverSock.bind(("", self.port))
+            self.serverSock.settimeout(5.0)
+            self.serverSock.bind(("", bluetooth.PORT_ANY))
             self.serverSock.listen(1)
+
+            self.port = self.serverSock.getsockname()[1]
 
             self.serviceUuid = "00001101-0000-1000-8000-00805F9B34FB"
 
@@ -54,33 +57,50 @@ class BtListen(Thread):
             setattr(self.cf, (flagField + "F"), True)
 
     def releaseForce(self):
+        print("[releaseForce]")
         for _, flagField in self.modules.values():
             setattr(self.cf, (flagField + "F"), False)
-        self.cf.controlForce = True
+        self.cf.setF = False
+        self.cf.releaseF = True
 
     def run(self):
         while True:
-            print("BT Listen")
             try:
-                clientSock, clientInfo = self.serverSock.accept()
+                try:
+                    clientSock, clientInfo = self.serverSock.accept()
+                except BluetoothError as e:
+                    if "timed out" in str(e):
+                        continue
+                    raise
+
+                print(f"[BT] Connected: {clientInfo}")
+                clientSock.settimeout(10.0)
 
                 while True:
-                    data = clientSock.recv(1024)
+                    try:
+                        data = clientSock.recv(1024)
+                    except BluetoothError as e:
+                        if "timed out" in str(e):
+                            print("[BT] recv timeout")
+                            break
+                        raise
+
                     if not data:
                         print("[BT] Client disconnected")
                         break
+
                     print(f"[BT] Received: {data}")
                     try:
                         module, value = data.decode().strip().split(".")
                         self.controlForce(module, value == "1")
+                        self.cf.setF = True
                         clientSock.send(b"ok")
                     except Exception as e:
                         print(f"BT message error: {e}")
                         clientSock.send(b"error")
 
-                clientSock.close()
-                self.releaseForce()
-
             except Exception as e:
                 print(f"BT thread error: {e}")
                 time.sleep(1)
+            finally:
+                self.releaseForce()
